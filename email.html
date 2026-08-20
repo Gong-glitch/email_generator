@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CALLS Network Single-Page Email Builder</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <script>
+        (function(){
+            emailjs.init("PkFT3ymlm_IvPmkNw"); 
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #cbd5e1;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            color: #111;
+        }
+
+        @media (min-width: 1024px) {
+            body {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+            .editor-panel {
+                flex: 0 0 35%;
+                max-width: 35%;
+                max-height: 96vh;
+                position: sticky;
+                top: 15px;
+            }
+            .preview-panel {
+                flex: 0 0 65%;
+                max-width: 65%;
+            }
+        }
+
+        .editor-panel {
+            width: 100%;
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            overflow-y: auto;
+        }
+
+        .editor-panel h2 {
+            margin-top: 0;
+            color: #205470;
+            border-bottom: 2px solid #205470;
+            padding-bottom: 6px;
+            font-size: 17px;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #ff5252;
+            text-transform: uppercase;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            border-bottom: 1px dashed #cbd5e1;
+            padding-bottom: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group { margin-bottom: 8px; }
+
+        .form-group label {
+            display: block;
+            font-size: 10.5px;
+            font-weight: bold;
+            color: #334155;
+            margin-bottom: 2px;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 11.5px;
+            background-color: #fff;
+        }
+
+        .email-input-wrapper {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .email-input-wrapper input {
+            flex: 1;
+            padding: 6px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 11.5px;
+        }
+
+        .btn-add-email {
+            background-color: #205470;
+            color: white;
+            border: none;
+            padding: 0 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .email-chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+            max-height: 120px;
+            overflow-y: auto;
+            padding: 2px;
+        }
+
+        .email-chip {
+            background-color: #e2e8f0;
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .email-chip .remove-btn {
+            cursor: pointer;
+            color: #ef4444;
+            font-weight: bold;
+            border: none;
+            background: none;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            width: 100%;
+            font-weight: bold;
+            padding: 9px;
+            text-align: center;
+        }
+
+        .btn-send { background-color: #205470; color: white; }
+        .btn-send:hover { background-color: #123345; }
+        .btn-pdf { background-color: #ff5252; color: white; }
+
+        .preview-panel {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .single-page {
+            width: 210mm;
+            min-height: 297mm;
+            background-color: #f7f3e8;
+            padding: 12mm 14mm;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 16px;
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+
+        .slab-font {
+            font-family: 'Alfa Slab One', 'Rockwell', 'Courier New', serif;
+            font-weight: 400;
+        }
+
+        .top-date-row { text-align: right; font-size: 18px; color: #000000; }
+
+        .banner-wrapper {
+            position: relative;
+            width: 100%;
+            height: 130px;
+            background-color: #f3be6c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .circle-group { position: absolute; top: -12px; left: -12px; width: 180px; height: 130px; z-index: 2; }
+        .circle-red { position: absolute; width: 130px; height: 130px; background-color: #ff5252; border-radius: 50%; top: 0; left: -15px; }
+        .circle-teal { position: absolute; width: 76px; height: 76px; background-color: #0097ab; border-radius: 50%; top: -10px; left: 45px; }
+        .circle-navy { position: absolute; width: 70px; height: 70px; background-color: #205470; border-radius: 50%; top: 20px; left: 75px; }
+
+        .main-title { font-size: 28px; color: #000000; margin: 0; z-index: 3; padding-top: 50px; }
+
+        .pill-banner {
+            background-color: #0097ab;
+            color: #ffffff;
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 0.9px;
+            padding: 8px;
+            border-radius: 20px;
+        }
+
+        .top-grid { display: grid; grid-template-columns: 36% 62%; gap: 2%; }
+
+        .teal-box { background-color: #008b9b; color: white; padding: 18px 16px; border-radius: 3px; }
+        .teal-box .salutation { font-size: 12.5px; font-weight: bold; }
+        .teal-box p { font-size: 11.5px; line-height: 1.45; margin: 8px 0; }
+
+        .pink-box { background-color: #ff5252; color: #000; padding: 18px 16px; border-radius: 3px; margin-bottom: 12px; }
+        .pink-box h3 { font-size: 16px; margin: 0 0 8px 0; }
+        .pink-box ul { margin: 0; padding-left: 16px; }
+
+        .screenshot-footer-box {
+            background-color: #2c597c;
+            color: #ffffff;
+            padding: 16px 14px;
+            font-size: 11px;
+            border-radius: 2px;
+            display: grid;
+            grid-template-columns: 46% 51%;
+            gap: 3%;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            align-items: center;
+        }
+
+        .social-icon-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 11px;
+            text-decoration: none;
+            font-family: Arial, sans-serif;
+        }
+
+        .fb-bg { background-color: #1877f2; }
+        .in-bg { background-color: #0a66c2; }
+        .ig-bg { background-color: #e4405f; }
+
+        .bottom-sections { display: flex; flex-direction: column; gap: 12px; }
+
+        .p2-red-block { background-color: #e54c38; color: #000; padding: 16px 18px; border-radius: 3px; }
+        .p2-teal-block { background-color: #008b9b; color: #fff; padding: 16px 18px; border-radius: 3px; }
+        .p2-orange-block { background-color: #f3be6c; color: #000; padding: 16px 18px; border-radius: 3px; }
+        .p2-blue-block { background-color: #2c597c; color: #fff; padding: 16px 18px; border-radius: 3px; }
+        
+        .p2-red-block h2, .p2-teal-block h3, .p2-orange-block h3, .p2-blue-block h3 { margin-top: 0; }
+    </style>
+</head>
+<body>
+
+    <!-- EDITOR PANEL -->
+    <div class="editor-panel">
+        <h2>Single-Page Newsletter Editor</h2>
+
+        <div class="section-title">1. Dispatch Settings</div>
+        <div class="form-group">
+            <label>Recipient Emails:</label>
+            <div class="email-input-wrapper">
+                <input type="email" id="emailInput" placeholder="Type email and hit Enter" onkeydown="handleEmailKeydown(event)">
+                <button type="button" class="btn-add-email" onclick="addEmailFromInput()">+</button>
+            </div>
+            <div class="email-chips-container" id="emailChipsContainer"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Subject Line:</label>
+            <input type="text" id="inSubject" value="CALLS Network Quarterly Newsletter - Q2 2026">
+        </div>
+
+        <div class="section-title">2. Header Details</div>
+        <div class="form-group">
+            <label>Quarter Label:</label>
+            <input type="text" id="inQuarter" value="Quarter 2, 2026" oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>Main Title:</label>
+            <input type="text" id="inMainTitle" value="CALLS Network Quarterly Newsletter" oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>Tagline Pill:</label>
+            <input type="text" id="inPillTagline" value="REFUGEE AGENCY • GRASSROOTS SOLIDARITIES • SYSTEM CHANGE" oninput="update()">
+        </div>
+
+        <div class="section-title">3. Intro Box (Teal)</div>
+        <div class="form-group">
+            <label>Salutation:</label>
+            <input type="text" id="inSalutation" value="Dear Volunteers and Friends," oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>Intro Text:</label>
+            <textarea id="inIntroText" rows="3" oninput="update()">Three months ago we told you the story of our first quarter: a season of beginnings. This quarter has been about deepening those beginnings...</textarea>
+        </div>
+
+        <div class="section-title">4. Highlights Box (Red)</div>
+        <div class="form-group">
+            <label>Section Title:</label>
+            <input type="text" id="inPinkTitle" value="Strengthening CALLS Network from the inside" oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>Subtext Intro:</label>
+            <textarea id="inPinkSubtext" rows="2" oninput="update()">A newsletter can only show you the visible half of our work. The foundations below exist because individual volunteers gave sustained hours...</textarea>
+        </div>
+        <div class="form-group">
+            <label>Bullet Points (1 per line):</label>
+            <textarea id="inPinkBullets" rows="3" oninput="update()">A Due Diligence process was adopted by our Board, with a clear risk management framework.
+New internal communication pipelines were created to connect regional branches.</textarea>
+        </div>
+
+        <div class="section-title">5. Social Media Links</div>
+        <div class="form-group">
+            <label>Facebook Link:</label>
+            <input type="text" id="inFbUrl" value="https://facebook.com" placeholder="https://facebook.com/..." oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>LinkedIn Link:</label>
+            <input type="text" id="inLiUrl" value="https://linkedin.com" placeholder="https://linkedin.com/..." oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>Instagram Link:</label>
+            <input type="text" id="inIgUrl" value="https://instagram.com" placeholder="https://instagram.com/..." oninput="update()">
+        </div>
+
+        <div class="section-title">6. Consolidation Block (Red)</div>
+        <div class="form-group">
+            <label>Header Title:</label>
+            <input type="text" id="inP2RedTitle" value="A quarter of consolidation" oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>Header Subtext:</label>
+            <textarea id="inP2RedSub" rows="2" oninput="update()">Outlining our strategic milestones across the four core operational pillars during Q2 2026.</textarea>
+        </div>
+
+        <div class="section-title">7. Movement Block (Teal)</div>
+        <div class="form-group">
+            <label>Section Title:</label>
+            <input type="text" id="inP2TealTitle" value="Growing our movement across Europe" oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>Intro Text:</label>
+            <textarea id="inP2TealIntro" rows="2" oninput="update()">Expanding local volunteer teams while strengthening European network hubs.</textarea>
+        </div>
+        <div class="form-group">
+            <label>Bullet Points (1 per line):</label>
+            <textarea id="inP2TealBullets" rows="3" oninput="update()">Onboarded 45 new grassroots solidarity volunteers in southern hubs.
+Organized three cross-border training sessions for refugee advocacy leaders.</textarea>
+        </div>
+
+        <div class="section-title">8. Standing Block (Orange)</div>
+        <div class="form-group">
+            <label>Section Title:</label>
+            <input type="text" id="inP2YellowTitle" value="Standing with refugee-led organisations" oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>Paragraph Intro:</label>
+            <textarea id="inP2YellowP1" rows="2" oninput="update()">Direct support programs and resource sharing with self-led grassroots initiatives.</textarea>
+        </div>
+        <div class="form-group">
+            <label>Bullet Points (1 per line):</label>
+            <textarea id="inP2YellowBullets" rows="3" oninput="update()">Co-funded two community kitchens operating in high-demand transit centers.
+Provided legal literacy toolkits translated into 5 languages.</textarea>
+        </div>
+
+        <div class="section-title">9. Mobilising Block (Dark Blue)</div>
+        <div class="form-group">
+            <label>Section Title:</label>
+            <input type="text" id="inP2BlueTitle" value="Mobilising resources, building partnerships" oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>Bullet Points (1 per line):</label>
+            <textarea id="inP2BlueBullets" rows="2" oninput="update()">Secured operational grants for Q3/Q4 implementation.
+Formed new strategic alliances with municipal advocacy groups.</textarea>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-send" onclick="sendBatchEmail()">🚀 Send Email Campaign</button>
+            <button class="btn btn-pdf" onclick="exportToPDF()">📄 Export PDF</button>
+        </div>
+    </div>
+
+    <!-- PREVIEW CANVAS -->
+    <div class="preview-panel">
+        <div class="single-page" id="documentContainer">
+            <div class="top-date-row slab-font" id="outQuarter">Quarter 2, 2026</div>
+
+            <div class="banner-wrapper">
+                <div class="circle-group">
+                    <div class="circle-red"></div>
+                    <div class="circle-teal"></div>
+                    <div class="circle-navy"></div>
+                </div>
+                <h1 class="main-title slab-font" id="outMainTitle">CALLS Network Quarterly Newsletter</h1>
+            </div>
+
+            <div class="pill-banner" id="outPillTagline">REFUGEE AGENCY • GRASSROOTS SOLIDARITIES • SYSTEM CHANGE</div>
+
+            <div class="top-grid">
+                <div class="teal-box">
+                    <div class="salutation" id="outSalutation">Dear Volunteers and Friends,</div>
+                    <p id="outIntroText"></p>
+                    <div>With gratitude,<br><strong>CALLS Network team</strong></div>
+                </div>
+
+                <div>
+                    <div class="pink-box">
+                        <h3 id="outPinkTitle"></h3>
+                        <div id="outPinkSubtext"></div>
+                        <ul id="outPinkBullets"></ul>
+                    </div>
+
+                    <div class="screenshot-footer-box">
+                        <div>
+                            <div>Contact Us:</div>
+                            <div><u>CALLSnetwork@Outlook.com</u></div>
+                            <div>www.callsnetwork.org</div>
+                            <div class="social-links">
+                                <a href="#" id="outFbLink" target="_blank" class="social-icon-btn fb-bg" title="Facebook">f</a>
+                                <a href="#" id="outLiLink" target="_blank" class="social-icon-btn in-bg" title="LinkedIn">in</a>
+                                <a href="#" id="outIgLink" target="_blank" class="social-icon-btn ig-bg" title="Instagram">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                        <div>
+                            On LI, we've reached 1,000 followers with a 10-40% engagement rate (well above the typical 5-15% rate).
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-sections">
+                <div class="p2-red-block">
+                    <h2 id="outP2RedTitle"></h2>
+                    <p id="outP2RedSub"></p>
+                </div>
+
+                <div class="p2-teal-block">
+                    <h3 id="outP2TealTitle"></h3>
+                    <p id="outP2TealIntro"></p>
+                    <ul id="outP2TealBullets"></ul>
+                </div>
+
+                <div class="p2-orange-block">
+                    <h3 id="outP2YellowTitle"></h3>
+                    <p id="outP2YellowP1"></p>
+                    <ul id="outP2YellowBullets"></ul>
+                </div>
+
+                <div class="p2-blue-block">
+                    <h3 id="outP2BlueTitle"></h3>
+                    <ul id="outP2BlueBullets"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let recipientEmails = [];
+
+        function renderEmailChips() {
+            const container = document.getElementById('emailChipsContainer');
+            container.innerHTML = '';
+            recipientEmails.forEach((email, index) => {
+                const chip = document.createElement('div');
+                chip.className = 'email-chip';
+                chip.innerHTML = `<span>${email}</span><button type="button" class="remove-btn" onclick="removeEmail(${index})">&times;</button>`;
+                container.appendChild(chip);
+            });
+        }
+
+        function addEmailFromInput() {
+            const input = document.getElementById('emailInput');
+            const value = input.value.trim().replace(',', '');
+            if (value && !recipientEmails.includes(value)) {
+                recipientEmails.push(value);
+                renderEmailChips();
+                input.value = '';
+            }
+        }
+
+        function handleEmailKeydown(event) {
+            if (event.key === 'Enter' || event.key === ',') {
+                event.preventDefault();
+                addEmailFromInput();
+            }
+        }
+
+        function removeEmail(index) {
+            recipientEmails.splice(index, 1);
+            renderEmailChips();
+        }
+
+        function renderBulletList(inputId, outputId) {
+            const inputEl = document.getElementById(inputId);
+            const targetUl = document.getElementById(outputId);
+            if (!inputEl || !targetUl) return;
+
+            const items = inputEl.value.split('\n').filter(line => line.trim() !== '');
+            targetUl.innerHTML = items.map(item => `<li>${item}</li>`).join('');
+        }
+
+        function update() {
+            document.getElementById('outQuarter').innerText = document.getElementById('inQuarter').value;
+            document.getElementById('outMainTitle').innerText = document.getElementById('inMainTitle').value;
+            document.getElementById('outPillTagline').innerText = document.getElementById('inPillTagline').value;
+
+            document.getElementById('outSalutation').innerText = document.getElementById('inSalutation').value;
+            document.getElementById('outIntroText').innerText = document.getElementById('inIntroText').value;
+
+            document.getElementById('outPinkTitle').innerText = document.getElementById('inPinkTitle').value;
+            document.getElementById('outPinkSubtext').innerText = document.getElementById('inPinkSubtext').value;
+            renderBulletList('inPinkBullets', 'outPinkBullets');
+
+            document.getElementById('outFbLink').href = document.getElementById('inFbUrl').value || '#';
+            document.getElementById('outLiLink').href = document.getElementById('inLiUrl').value || '#';
+            document.getElementById('outIgLink').href = document.getElementById('inIgUrl').value || '#';
+
+            document.getElementById('outP2RedTitle').innerText = document.getElementById('inP2RedTitle').value;
+            document.getElementById('outP2RedSub').innerText = document.getElementById('inP2RedSub').value;
+
+            document.getElementById('outP2TealTitle').innerText = document.getElementById('inP2TealTitle').value;
+            document.getElementById('outP2TealIntro').innerText = document.getElementById('inP2TealIntro').value;
+            renderBulletList('inP2TealBullets', 'outP2TealBullets');
+
+            document.getElementById('outP2YellowTitle').innerText = document.getElementById('inP2YellowTitle').value;
+            document.getElementById('outP2YellowP1').innerText = document.getElementById('inP2YellowP1').value;
+            renderBulletList('inP2YellowBullets', 'outP2YellowBullets');
+
+            document.getElementById('outP2BlueTitle').innerText = document.getElementById('inP2BlueTitle').value;
+            renderBulletList('inP2BlueBullets', 'outP2BlueBullets');
+        }
+
+        function buildEmailTableHTML() {
+            const quarter = document.getElementById('inQuarter').value;
+            const mainTitle = document.getElementById('inMainTitle').value;
+            const tagline = document.getElementById('inPillTagline').value;
+            const salutation = document.getElementById('inSalutation').value;
+            const intro = document.getElementById('inIntroText').value;
+
+            const fbUrl = document.getElementById('inFbUrl').value || '#';
+            const liUrl = document.getElementById('inLiUrl').value || '#';
+            const igUrl = document.getElementById('inIgUrl').value || '#';
+
+            const pinkTitle = document.getElementById('inPinkTitle').value;
+            const pinkSubtext = document.getElementById('inPinkSubtext').value;
+            const pinkBullets = document.getElementById('inPinkBullets').value.split('\n').filter(x => x.trim()).map(x => `<li>${x}</li>`).join('');
+
+            const p2RedTitle = document.getElementById('inP2RedTitle').value;
+            const p2RedSub = document.getElementById('inP2RedSub').value;
+
+            const p2TealTitle = document.getElementById('inP2TealTitle').value;
+            const p2TealIntro = document.getElementById('inP2TealIntro').value;
+            const p2TealBullets = document.getElementById('inP2TealBullets').value.split('\n').filter(x => x.trim()).map(x => `<li>${x}</li>`).join('');
+
+            const p2YellowTitle = document.getElementById('inP2YellowTitle').value;
+            const p2YellowP1 = document.getElementById('inP2YellowP1').value;
+            const p2YellowBullets = document.getElementById('inP2YellowBullets').value.split('\n').filter(x => x.trim()).map(x => `<li>${x}</li>`).join('');
+
+            const p2BlueTitle = document.getElementById('inP2BlueTitle').value;
+            const p2BlueBullets = document.getElementById('inP2BlueBullets').value.split('\n').filter(x => x.trim()).map(x => `<li>${x}</li>`).join('');
+
+            return `
+            <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#cbd5e1; padding:20px 0; width:100%;">
+              <tr>
+                <td align="center">
+                  <table role="presentation" width="650" border="0" cellspacing="0" cellpadding="0" style="background-color:#f7f3e8; padding:25px; font-family:Georgia, serif; color:#111111; width:650px;">
+                    
+                    <tr>
+                      <td align="right" style="font-size:16px; font-weight:bold; padding-bottom:10px; font-family:Arial, sans-serif;">${quarter}</td>
+                    </tr>
+
+                    <!-- REVISED EMAIL-SAFE HEADER BANNER -->
+                    <tr>
+                      <td style="background-color:#f3be6c; padding:20px 15px; border-radius:4px;">
+                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <td width="130" valign="middle">
+                              <!-- OVERLAPPING CIRCLES INLINE TABLE -->
+                              <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="width:120px; height:90px;">
+                                <tr>
+                                  <td valign="top">
+                                    <div style="background-color:#ff5252; width:80px; height:80px; border-radius:50%; display:inline-block; vertical-align:middle;"></div>
+                                    <div style="background-color:#0097ab; width:50px; height:50px; border-radius:50%; display:inline-block; margin-left:-35px; margin-top:-20px; vertical-align:middle;"></div>
+                                    <div style="background-color:#205470; width:40px; height:40px; border-radius:50%; display:inline-block; margin-left:-30px; margin-top:20px; vertical-align:middle;"></div>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                            <td valign="middle" align="left" style="padding-left:15px;">
+                              <h1 style="margin:0; font-size:24px; color:#000000; font-family:Arial, sans-serif; font-weight:bold; line-height:1.2;">${mainTitle}</h1>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding:15px 0;">
+                        <div style="background-color:#0097ab; color:#ffffff; text-align:center; padding:10px; font-size:11px; font-weight:bold; letter-spacing:1px; border-radius:20px; font-family:Arial, sans-serif;">
+                          ${tagline}
+                        </div>
+                      </td>
+                    </tr>
+
+                    <!-- 2 COLUMN TOP SECTION -->
+                    <tr>
+                      <td style="padding-bottom:15px;">
+                        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <!-- LEFT TEAL COLUMN -->
+                            <td width="235" valign="top" style="background-color:#008b9b; color:#ffffff; padding:15px; border-radius:4px; font-size:12px; line-height:1.4; font-family:Arial, sans-serif;">
+                              <strong>${salutation}</strong><br><br>
+                              ${intro}<br><br>
+                              With gratitude,<br>
+                              <strong>CALLS Network team</strong>
+                            </td>
+                            <td width="15"></td>
+                            <!-- RIGHT COLUMN -->
+                            <td width="350" valign="top">
+                              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                  <td style="background-color:#ff5252; color:#000000; padding:15px; border-radius:4px; font-size:12px; line-height:1.4; font-family:Arial, sans-serif;">
+                                    <h3 style="margin:0 0 6px 0; font-size:14px; color:#000000;">${pinkTitle}</h3>
+                                    ${pinkSubtext}
+                                    <ul style="margin:6px 0 0 0; padding-left:16px;">${pinkBullets}</ul>
+                                  </td>
+                                </tr>
+                                <tr><td height="10"></td></tr>
+                                <tr>
+                                  <td style="background-color:#2c597c; color:#ffffff; padding:12px; border-radius:4px; font-size:11px; line-height:1.4; font-family:Arial, sans-serif;">
+                                    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                                      <tr>
+                                        <td width="50%" valign="top" style="color:#ffffff;">
+                                          Contact Us:<br>
+                                          <u>CALLSnetwork@Outlook.com</u><br>
+                                          www.callsnetwork.org<br><br>
+                                          
+                                          <table role="presentation" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                              <td style="background-color:#1877f2; width:22px; height:22px; border-radius:50%; text-align:center;" valign="middle">
+                                                <a href="${fbUrl}" target="_blank" style="color:#ffffff; text-decoration:none; font-weight:bold; font-size:11px; font-family:Arial, sans-serif;">f</a>
+                                              </td>
+                                              <td width="6"></td>
+                                              <td style="background-color:#0a66c2; width:22px; height:22px; border-radius:50%; text-align:center;" valign="middle">
+                                                <a href="${liUrl}" target="_blank" style="color:#ffffff; text-decoration:none; font-weight:bold; font-size:10px; font-family:Arial, sans-serif;">in</a>
+                                              </td>
+                                              <td width="6"></td>
+                                              <td style="background-color:#e4405f; width:22px; height:22px; border-radius:50%; text-align:center;" valign="middle">
+                                                <a href="${igUrl}" target="_blank" style="color:#ffffff; text-decoration:none; display:inline-block; line-height:0;">
+                                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                                                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                                                      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                                                  </svg>
+                                                </a>
+                                              </td>
+                                            </tr>
+                                          </table>
+
+                                        </td>
+                                        <td width="50%" valign="top" style="color:#ffffff; font-size:10px;">
+                                          On LI, we've reached 1,000 followers with a 10-40% engagement rate (well above typical 5-15%).
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+
+                    <!-- LOWER BLOCKS -->
+                    <tr>
+                      <td style="padding-bottom:10px;">
+                        <div style="background-color:#e54c38; color:#000000; padding:14px; border-radius:4px; font-size:12px; font-family:Arial, sans-serif;">
+                          <h2 style="margin:0 0 4px 0; font-size:15px; color:#000000;">${p2RedTitle}</h2>
+                          ${p2RedSub}
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding-bottom:10px;">
+                        <div style="background-color:#008b9b; color:#ffffff; padding:14px; border-radius:4px; font-size:12px; font-family:Arial, sans-serif;">
+                          <h3 style="margin:0 0 4px 0; font-size:14px; color:#ffffff;">${p2TealTitle}</h3>
+                          ${p2TealIntro}
+                          <ul style="margin:6px 0 0 0; padding-left:16px;">${p2TealBullets}</ul>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding-bottom:10px;">
+                        <div style="background-color:#f3be6c; color:#000000; padding:14px; border-radius:4px; font-size:12px; font-family:Arial, sans-serif;">
+                          <h3 style="margin:0 0 4px 0; font-size:14px; color:#000000;">${p2YellowTitle}</h3>
+                          ${p2YellowP1}
+                          <ul style="margin:6px 0 0 0; padding-left:16px;">${p2YellowBullets}</ul>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <div style="background-color:#2c597c; color:#ffffff; padding:14px; border-radius:4px; font-size:12px; font-family:Arial, sans-serif;">
+                          <h3 style="margin:0 0 4px 0; font-size:14px; color:#ffffff;">${p2BlueTitle}</h3>
+                          <ul style="margin:6px 0 0 0; padding-left:16px;">${p2BlueBullets}</ul>
+                        </div>
+                      </td>
+                    </tr>
+
+                  </table>
+                </td>
+              </tr>
+            </table>`;
+        }
+
+        async function sendBatchEmail() {
+            addEmailFromInput();
+            const subject = document.getElementById('inSubject').value;
+
+            if (recipientEmails.length === 0) {
+                alert("Please add at least one recipient email address.");
+                return;
+            }
+
+            const btn = document.querySelector('.btn-send');
+            btn.innerText = "⏳ Sending Email...";
+            btn.disabled = true;
+
+            const htmlPayload = buildEmailTableHTML();
+
+            try {
+                for (const recipient of recipientEmails) {
+                    await emailjs.send("service_4xqcb85", "template_3rj66gn", {
+                        to_email: recipient,
+                        subject: subject,
+                        html_body: htmlPayload
+                    });
+                }
+                alert("🎉 Newsletter sent successfully with full email client compatibility!");
+            } catch (error) {
+                console.error("Email send failed:", error);
+                alert("Failed to send email. Check EmailJS credentials and browser console.");
+            } finally {
+                btn.innerText = "🚀 Send Email Campaign";
+                btn.disabled = false;
+            }
+        }
+
+        async function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+
+            const canvas = await html2canvas(document.getElementById('documentContainer'), { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+            
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, imgHeight);
+            pdf.save('CALLS_Network_Newsletter.pdf');
+        }
+
+        window.onload = function() {
+            renderEmailChips();
+            update();
+        };
+    </script>
+</body>
+</html>

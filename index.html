@@ -68,6 +68,24 @@
             font-size: 17px;
         }
 
+        .format-help {
+            background: #fffbea;
+            border: 1px solid #f3be6c;
+            border-radius: 4px;
+            padding: 8px 10px;
+            font-size: 11px;
+            color: #334155;
+            line-height: 1.5;
+        }
+        .format-help code {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            padding: 0 4px;
+            font-size: 11px;
+        }
+        .format-help mark { background: #fff176; padding: 0 2px; }
+
         .section-title {
             font-size: 11px;
             font-weight: bold;
@@ -184,6 +202,7 @@
             align-items: center;
         }
 
+        /* Same font throughout the newsletter (matches the email version) */
         .single-page {
             width: 210mm;
             min-height: 297mm;
@@ -195,13 +214,15 @@
             flex-direction: column;
             justify-content: flex-start;
             gap: 16px;
-            font-family: 'Georgia', 'Times New Roman', serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         .slab-font {
             font-family: 'Alfa Slab One', 'Rockwell', 'Courier New', serif;
             font-weight: 400;
         }
+
+        .hl { background-color: #fff176; color: #000; padding: 0 2px; }
 
         .top-date-row { text-align: right; font-size: 18px; color: #000000; }
 
@@ -236,13 +257,13 @@
 
         .top-grid { display: grid; grid-template-columns: 36% 62%; gap: 2%; }
 
-        .teal-box { background-color: #008b9b; color: white; padding: 18px 16px; border-radius: 3px; }
+        .teal-box { background-color: #008b9b; color: white; padding: 18px 16px; border-radius: 3px; font-size: 11.5px; line-height: 1.45; }
         .teal-box .salutation { font-size: 12.5px; font-weight: bold; }
         .teal-box p { font-size: 11.5px; line-height: 1.45; margin: 8px 0; }
 
-        .pink-box { background-color: #ff5252; color: #000; padding: 18px 16px; border-radius: 3px; margin-bottom: 12px; }
+        .pink-box { background-color: #ff5252; color: #000; padding: 18px 16px; border-radius: 3px; margin-bottom: 12px; font-size: 11.5px; line-height: 1.45; }
         .pink-box h3 { font-size: 16px; margin: 0 0 8px 0; }
-        .pink-box ul { margin: 0; padding-left: 16px; }
+        .pink-box ul { margin: 6px 0 0 0; padding-left: 16px; }
 
         .screenshot-footer-box {
             background-color: #2c597c;
@@ -296,6 +317,13 @@
     <div class="editor-panel">
         <h2>Single-Page Newsletter Editor</h2>
 
+        <div class="format-help">
+            <strong>Text formatting</strong> (works in every box):<br>
+            <code>**word**</code> → <strong>bold</strong><br>
+            <code>==word==</code> → <mark>yellow highlight</mark><br>
+            <code>**==word==**</code> → <strong><mark>bold + highlight</mark></strong>
+        </div>
+
         <div class="section-title">1. Dispatch Settings</div>
         <div class="form-group">
             <label>Recipient Emails:</label>
@@ -332,7 +360,7 @@
         </div>
         <div class="form-group">
             <label>Intro Text:</label>
-            <textarea id="inIntroText" rows="3" oninput="update()">Three months ago we told you the story of our first quarter: a season of beginnings. This quarter has been about deepening those beginnings...</textarea>
+            <textarea id="inIntroText" rows="3" oninput="update()">Three months ago we told you the story of our first quarter: **a season of beginnings**. This quarter has been about deepening those beginnings...</textarea>
         </div>
 
         <div class="section-title">4. Highlights Box (Red)</div>
@@ -346,7 +374,7 @@
         </div>
         <div class="form-group">
             <label>Bullet Points (1 per line):</label>
-            <textarea id="inPinkBullets" rows="3" oninput="update()">A Due Diligence process was adopted by our Board, with a clear risk management framework.
+            <textarea id="inPinkBullets" rows="3" oninput="update()">A **Due Diligence process** was adopted by our Board, with a clear risk management framework.
 New internal communication pipelines were created to connect regional branches.</textarea>
         </div>
 
@@ -385,7 +413,7 @@ New internal communication pipelines were created to connect regional branches.<
         </div>
         <div class="form-group">
             <label>Bullet Points (1 per line):</label>
-            <textarea id="inP2TealBullets" rows="3" oninput="update()">Onboarded 45 new grassroots solidarity volunteers in southern hubs.
+            <textarea id="inP2TealBullets" rows="3" oninput="update()">Onboarded **45 new** grassroots solidarity volunteers in southern hubs.
 Organized three cross-border training sessions for refugee advocacy leaders.</textarea>
         </div>
 
@@ -504,6 +532,37 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
     <script>
         let recipientEmails = [];
 
+        /* ---------- TEXT FORMATTING ----------
+           **text**  -> bold
+           ==text==  -> yellow highlight
+           Inline styles are used so it also works inside email clients. */
+        function fmt(text) {
+            let s = (text || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            s = s.replace(/\*\*([\s\S]+?)\*\*/g, '<strong>$1</strong>');
+            s = s.replace(/==([\s\S]+?)==/g, '<span style="background-color:#fff176; color:#000000; padding:0 2px;">$1</span>');
+            s = s.replace(/\n/g, '<br>');
+            return s;
+        }
+
+        function getVal(id) {
+            return document.getElementById(id).value;
+        }
+
+        function setHTML(outId, inId) {
+            document.getElementById(outId).innerHTML = fmt(getVal(inId));
+        }
+
+        function bulletItems(inputId) {
+            return getVal(inputId)
+                .split('\n')
+                .filter(line => line.trim() !== '')
+                .map(line => `<li>${fmt(line)}</li>`)
+                .join('');
+        }
+
         function renderEmailChips() {
             const container = document.getElementById('emailChipsContainer');
             container.innerHTML = '';
@@ -517,7 +576,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
 
         function addEmailFromInput() {
             const input = document.getElementById('emailInput');
-            const value = input.value.trim().replace(',', '');
+            const value = input.value.trim().replace(/,/g, '');
             if (value && !recipientEmails.includes(value)) {
                 recipientEmails.push(value);
                 renderEmailChips();
@@ -537,92 +596,81 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
             renderEmailChips();
         }
 
-        function renderBulletList(inputId, outputId) {
-            const inputEl = document.getElementById(inputId);
-            const targetUl = document.getElementById(outputId);
-            if (!inputEl || !targetUl) return;
-
-            const items = inputEl.value.split('\n').filter(line => line.trim() !== '');
-            targetUl.innerHTML = items.map(item => `<li>${item}</li>`).join('');
-        }
-
         function update() {
-            document.getElementById('outQuarter').innerText = document.getElementById('inQuarter').value;
-            document.getElementById('outMainTitle').innerText = document.getElementById('inMainTitle').value;
-            document.getElementById('outPillTagline').innerText = document.getElementById('inPillTagline').value;
+            setHTML('outQuarter', 'inQuarter');
+            setHTML('outMainTitle', 'inMainTitle');
+            setHTML('outPillTagline', 'inPillTagline');
 
-            document.getElementById('outSalutation').innerText = document.getElementById('inSalutation').value;
-            document.getElementById('outIntroText').innerText = document.getElementById('inIntroText').value;
+            setHTML('outSalutation', 'inSalutation');
+            setHTML('outIntroText', 'inIntroText');
 
-            document.getElementById('outPinkTitle').innerText = document.getElementById('inPinkTitle').value;
-            document.getElementById('outPinkSubtext').innerText = document.getElementById('inPinkSubtext').value;
-            renderBulletList('inPinkBullets', 'outPinkBullets');
+            setHTML('outPinkTitle', 'inPinkTitle');
+            setHTML('outPinkSubtext', 'inPinkSubtext');
+            document.getElementById('outPinkBullets').innerHTML = bulletItems('inPinkBullets');
 
-            document.getElementById('outFbLink').href = document.getElementById('inFbUrl').value || '#';
-            document.getElementById('outLiLink').href = document.getElementById('inLiUrl').value || '#';
-            document.getElementById('outIgLink').href = document.getElementById('inIgUrl').value || '#';
+            document.getElementById('outFbLink').href = getVal('inFbUrl') || '#';
+            document.getElementById('outLiLink').href = getVal('inLiUrl') || '#';
+            document.getElementById('outIgLink').href = getVal('inIgUrl') || '#';
 
-            document.getElementById('outP2RedTitle').innerText = document.getElementById('inP2RedTitle').value;
-            document.getElementById('outP2RedSub').innerText = document.getElementById('inP2RedSub').value;
+            setHTML('outP2RedTitle', 'inP2RedTitle');
+            setHTML('outP2RedSub', 'inP2RedSub');
 
-            document.getElementById('outP2TealTitle').innerText = document.getElementById('inP2TealTitle').value;
-            document.getElementById('outP2TealIntro').innerText = document.getElementById('inP2TealIntro').value;
-            renderBulletList('inP2TealBullets', 'outP2TealBullets');
+            setHTML('outP2TealTitle', 'inP2TealTitle');
+            setHTML('outP2TealIntro', 'inP2TealIntro');
+            document.getElementById('outP2TealBullets').innerHTML = bulletItems('inP2TealBullets');
 
-            document.getElementById('outP2YellowTitle').innerText = document.getElementById('inP2YellowTitle').value;
-            document.getElementById('outP2YellowP1').innerText = document.getElementById('inP2YellowP1').value;
-            renderBulletList('inP2YellowBullets', 'outP2YellowBullets');
+            setHTML('outP2YellowTitle', 'inP2YellowTitle');
+            setHTML('outP2YellowP1', 'inP2YellowP1');
+            document.getElementById('outP2YellowBullets').innerHTML = bulletItems('inP2YellowBullets');
 
-            document.getElementById('outP2BlueTitle').innerText = document.getElementById('inP2BlueTitle').value;
-            renderBulletList('inP2BlueBullets', 'outP2BlueBullets');
+            setHTML('outP2BlueTitle', 'inP2BlueTitle');
+            document.getElementById('outP2BlueBullets').innerHTML = bulletItems('inP2BlueBullets');
         }
 
         function buildEmailTableHTML() {
-            const quarter = document.getElementById('inQuarter').value;
-            const mainTitle = document.getElementById('inMainTitle').value;
-            const tagline = document.getElementById('inPillTagline').value;
-            const salutation = document.getElementById('inSalutation').value;
-            const intro = document.getElementById('inIntroText').value;
+            const quarter = fmt(getVal('inQuarter'));
+            const mainTitle = fmt(getVal('inMainTitle'));
+            const tagline = fmt(getVal('inPillTagline'));
+            const salutation = fmt(getVal('inSalutation'));
+            const intro = fmt(getVal('inIntroText'));
 
-            const fbUrl = document.getElementById('inFbUrl').value || '#';
-            const liUrl = document.getElementById('inLiUrl').value || '#';
-            const igUrl = document.getElementById('inIgUrl').value || '#';
+            const fbUrl = getVal('inFbUrl') || '#';
+            const liUrl = getVal('inLiUrl') || '#';
+            const igUrl = getVal('inIgUrl') || '#';
 
-            const pinkTitle = document.getElementById('inPinkTitle').value;
-            const pinkSubtext = document.getElementById('inPinkSubtext').value;
-            const pinkBullets = document.getElementById('inPinkBullets').value.split('\n').filter(x => x.trim()).map(x => `<li>${x}</li>`).join('');
+            const pinkTitle = fmt(getVal('inPinkTitle'));
+            const pinkSubtext = fmt(getVal('inPinkSubtext'));
+            const pinkBullets = bulletItems('inPinkBullets');
 
-            const p2RedTitle = document.getElementById('inP2RedTitle').value;
-            const p2RedSub = document.getElementById('inP2RedSub').value;
+            const p2RedTitle = fmt(getVal('inP2RedTitle'));
+            const p2RedSub = fmt(getVal('inP2RedSub'));
 
-            const p2TealTitle = document.getElementById('inP2TealTitle').value;
-            const p2TealIntro = document.getElementById('inP2TealIntro').value;
-            const p2TealBullets = document.getElementById('inP2TealBullets').value.split('\n').filter(x => x.trim()).map(x => `<li>${x}</li>`).join('');
+            const p2TealTitle = fmt(getVal('inP2TealTitle'));
+            const p2TealIntro = fmt(getVal('inP2TealIntro'));
+            const p2TealBullets = bulletItems('inP2TealBullets');
 
-            const p2YellowTitle = document.getElementById('inP2YellowTitle').value;
-            const p2YellowP1 = document.getElementById('inP2YellowP1').value;
-            const p2YellowBullets = document.getElementById('inP2YellowBullets').value.split('\n').filter(x => x.trim()).map(x => `<li>${x}</li>`).join('');
+            const p2YellowTitle = fmt(getVal('inP2YellowTitle'));
+            const p2YellowP1 = fmt(getVal('inP2YellowP1'));
+            const p2YellowBullets = bulletItems('inP2YellowBullets');
 
-            const p2BlueTitle = document.getElementById('inP2BlueTitle').value;
-            const p2BlueBullets = document.getElementById('inP2BlueBullets').value.split('\n').filter(x => x.trim()).map(x => `<li>${x}</li>`).join('');
+            const p2BlueTitle = fmt(getVal('inP2BlueTitle'));
+            const p2BlueBullets = bulletItems('inP2BlueBullets');
 
             return `
             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#cbd5e1; padding:20px 0; width:100%;">
               <tr>
                 <td align="center">
-                  <table role="presentation" width="650" border="0" cellspacing="0" cellpadding="0" style="background-color:#f7f3e8; padding:25px; font-family:Georgia, serif; color:#111111; width:650px;">
+                  <table role="presentation" width="650" border="0" cellspacing="0" cellpadding="0" style="background-color:#f7f3e8; padding:25px; font-family:Arial, Helvetica, sans-serif; color:#111111; width:650px;">
                     
                     <tr>
                       <td align="right" style="font-size:16px; font-weight:bold; padding-bottom:10px; font-family:Arial, sans-serif;">${quarter}</td>
                     </tr>
 
-                    <!-- REVISED EMAIL-SAFE HEADER BANNER -->
                     <tr>
                       <td style="background-color:#f3be6c; padding:20px 15px; border-radius:4px;">
                         <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                           <tr>
                             <td width="130" valign="middle">
-                              <!-- OVERLAPPING CIRCLES INLINE TABLE -->
                               <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="width:120px; height:90px;">
                                 <tr>
                                   <td valign="top">
@@ -649,12 +697,10 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                       </td>
                     </tr>
 
-                    <!-- 2 COLUMN TOP SECTION -->
                     <tr>
                       <td style="padding-bottom:15px;">
                         <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                           <tr>
-                            <!-- LEFT TEAL COLUMN -->
                             <td width="235" valign="top" style="background-color:#008b9b; color:#ffffff; padding:15px; border-radius:4px; font-size:12px; line-height:1.4; font-family:Arial, sans-serif;">
                               <strong>${salutation}</strong><br><br>
                               ${intro}<br><br>
@@ -662,12 +708,11 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                               <strong>CALLS Network team</strong>
                             </td>
                             <td width="15"></td>
-                            <!-- RIGHT COLUMN -->
                             <td width="350" valign="top">
                               <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
                                   <td style="background-color:#ff5252; color:#000000; padding:15px; border-radius:4px; font-size:12px; line-height:1.4; font-family:Arial, sans-serif;">
-                                    <h3 style="margin:0 0 6px 0; font-size:14px; color:#000000;">${pinkTitle}</h3>
+                                    <h3 style="margin:0 0 6px 0; font-size:14px; color:#000000; font-family:Arial, sans-serif;">${pinkTitle}</h3>
                                     ${pinkSubtext}
                                     <ul style="margin:6px 0 0 0; padding-left:16px;">${pinkBullets}</ul>
                                   </td>
@@ -677,7 +722,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                                   <td style="background-color:#2c597c; color:#ffffff; padding:12px; border-radius:4px; font-size:11px; line-height:1.4; font-family:Arial, sans-serif;">
                                     <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                       <tr>
-                                        <td width="50%" valign="top" style="color:#ffffff;">
+                                        <td width="50%" valign="top" style="color:#ffffff; font-family:Arial, sans-serif; font-size:11px;">
                                           Contact Us:<br>
                                           <u>CALLSnetwork@Outlook.com</u><br>
                                           www.callsnetwork.org<br><br>
@@ -705,7 +750,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                                           </table>
 
                                         </td>
-                                        <td width="50%" valign="top" style="color:#ffffff; font-size:10px;">
+                                        <td width="50%" valign="top" style="color:#ffffff; font-size:10px; font-family:Arial, sans-serif;">
                                           On LI, we've reached 1,000 followers with a 10-40% engagement rate (well above typical 5-15%).
                                         </td>
                                       </tr>
@@ -719,11 +764,10 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                       </td>
                     </tr>
 
-                    <!-- LOWER BLOCKS -->
                     <tr>
                       <td style="padding-bottom:10px;">
                         <div style="background-color:#e54c38; color:#000000; padding:14px; border-radius:4px; font-size:12px; font-family:Arial, sans-serif;">
-                          <h2 style="margin:0 0 4px 0; font-size:15px; color:#000000;">${p2RedTitle}</h2>
+                          <h2 style="margin:0 0 4px 0; font-size:15px; color:#000000; font-family:Arial, sans-serif;">${p2RedTitle}</h2>
                           ${p2RedSub}
                         </div>
                       </td>
@@ -732,7 +776,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                     <tr>
                       <td style="padding-bottom:10px;">
                         <div style="background-color:#008b9b; color:#ffffff; padding:14px; border-radius:4px; font-size:12px; font-family:Arial, sans-serif;">
-                          <h3 style="margin:0 0 4px 0; font-size:14px; color:#ffffff;">${p2TealTitle}</h3>
+                          <h3 style="margin:0 0 4px 0; font-size:14px; color:#ffffff; font-family:Arial, sans-serif;">${p2TealTitle}</h3>
                           ${p2TealIntro}
                           <ul style="margin:6px 0 0 0; padding-left:16px;">${p2TealBullets}</ul>
                         </div>
@@ -742,7 +786,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                     <tr>
                       <td style="padding-bottom:10px;">
                         <div style="background-color:#f3be6c; color:#000000; padding:14px; border-radius:4px; font-size:12px; font-family:Arial, sans-serif;">
-                          <h3 style="margin:0 0 4px 0; font-size:14px; color:#000000;">${p2YellowTitle}</h3>
+                          <h3 style="margin:0 0 4px 0; font-size:14px; color:#000000; font-family:Arial, sans-serif;">${p2YellowTitle}</h3>
                           ${p2YellowP1}
                           <ul style="margin:6px 0 0 0; padding-left:16px;">${p2YellowBullets}</ul>
                         </div>
@@ -752,7 +796,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                     <tr>
                       <td>
                         <div style="background-color:#2c597c; color:#ffffff; padding:14px; border-radius:4px; font-size:12px; font-family:Arial, sans-serif;">
-                          <h3 style="margin:0 0 4px 0; font-size:14px; color:#ffffff;">${p2BlueTitle}</h3>
+                          <h3 style="margin:0 0 4px 0; font-size:14px; color:#ffffff; font-family:Arial, sans-serif;">${p2BlueTitle}</h3>
                           <ul style="margin:6px 0 0 0; padding-left:16px;">${p2BlueBullets}</ul>
                         </div>
                       </td>
@@ -766,7 +810,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
 
         async function sendBatchEmail() {
             addEmailFromInput();
-            const subject = document.getElementById('inSubject').value;
+            const subject = getVal('inSubject');
 
             if (recipientEmails.length === 0) {
                 alert("Please add at least one recipient email address.");

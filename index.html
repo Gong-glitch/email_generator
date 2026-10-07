@@ -46,8 +46,8 @@
                 top: 15px;
             }
             .preview-panel {
-                flex: 0 0 65%;
-                max-width: 65%;
+                flex: 1 1 0;
+                min-width: 0;
             }
         }
 
@@ -201,6 +201,11 @@
             flex-direction: column;
             align-items: center;
         }
+
+        /* The A4 page keeps its real size (so the PDF stays correct)
+           and is scaled down to fit whatever space the screen has. */
+        .page-frame { overflow: hidden; }
+        .page-scaler { transform-origin: top left; width: 210mm; }
 
         /* Same font throughout the newsletter (matches the email version) */
         .single-page {
@@ -451,6 +456,8 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
 
     <!-- PREVIEW CANVAS -->
     <div class="preview-panel">
+      <div class="page-frame" id="pageFrame">
+       <div class="page-scaler" id="pageScaler">
         <div class="single-page" id="documentContainer">
             <div class="top-date-row slab-font" id="outQuarter">Quarter 2, 2026</div>
 
@@ -527,6 +534,8 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                 </div>
             </div>
         </div>
+       </div>
+      </div>
     </div>
 
     <script>
@@ -625,7 +634,27 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
 
             setHTML('outP2BlueTitle', 'inP2BlueTitle');
             document.getElementById('outP2BlueBullets').innerHTML = bulletItems('inP2BlueBullets');
+
+            fitPreview();
         }
+
+        /* Shrinks the A4 preview so it always fits the available width */
+        function fitPreview() {
+            const panel = document.querySelector('.preview-panel');
+            const frame = document.getElementById('pageFrame');
+            const scaler = document.getElementById('pageScaler');
+            const page = document.getElementById('documentContainer');
+
+            const pageW = page.offsetWidth;
+            const pageH = page.offsetHeight;
+            const scale = Math.min(1, panel.clientWidth / pageW);
+
+            scaler.style.transform = `scale(${scale})`;
+            frame.style.width = (pageW * scale) + 'px';
+            frame.style.height = (pageH * scale) + 'px';
+        }
+
+        window.addEventListener('resize', fitPreview);
 
         function buildEmailTableHTML() {
             const quarter = fmt(getVal('inQuarter'));
@@ -846,7 +875,15 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
             const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
 
-            const canvas = await html2canvas(document.getElementById('documentContainer'), { scale: 2, useCORS: true });
+            // Capture the page at full size, not the shrunken preview
+            const scaler = document.getElementById('pageScaler');
+            scaler.style.transform = 'none';
+            let canvas;
+            try {
+                canvas = await html2canvas(document.getElementById('documentContainer'), { scale: 2, useCORS: true });
+            } finally {
+                fitPreview();
+            }
             const imgData = canvas.toDataURL('image/jpeg', 1.0);
             const imgHeight = (canvas.height * pdfWidth) / canvas.width;
             

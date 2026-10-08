@@ -86,6 +86,38 @@
         }
         .format-help mark { background: #fff176; padding: 0 2px; }
 
+        .save-bar {
+            background: #eef5f8;
+            border: 1px solid #b9d3df;
+            border-radius: 4px;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+        }
+        .save-buttons { display: flex; gap: 6px; }
+        .btn-small {
+            flex: 1;
+            border: none;
+            border-radius: 4px;
+            background: #205470;
+            color: #fff;
+            font-size: 11.5px;
+            font-weight: bold;
+            padding: 7px 6px;
+            cursor: pointer;
+        }
+        .btn-small:hover { background: #123345; }
+        .save-status { font-size: 10.5px; color: #334155; margin-top: 6px; }
+
+        .form-group select {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 11.5px;
+            background-color: #fff;
+        }
+
         .section-title {
             font-size: 11px;
             font-weight: bold;
@@ -219,6 +251,7 @@
             flex-direction: column;
             justify-content: flex-start;
             gap: 16px;
+            --fs-adj: 0px;
             font-family: Georgia, 'Times New Roman', serif;
         }
 
@@ -229,7 +262,7 @@
 
         .hl { background-color: #fff176; color: #000; padding: 0 2px; }
 
-        .top-date-row { text-align: right; font-size: 19px; color: #000000; }
+        .top-date-row { text-align: right; font-size: calc(18px + var(--fs-adj, 0px)); color: #000000; }
 
         .banner-wrapper {
             position: relative;
@@ -238,7 +271,7 @@
             background-color: #f3be6c;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             margin-bottom: 12px;
         }
 
@@ -247,13 +280,13 @@
         .circle-teal { position: absolute; width: 76px; height: 76px; background-color: #0097ab; border-radius: 50%; top: -10px; left: 45px; }
         .circle-navy { position: absolute; width: 70px; height: 70px; background-color: #205470; border-radius: 50%; top: 20px; left: 75px; }
 
-        .main-title { font-size: 29px; color: #000000; margin: 0; z-index: 3; padding-top: 50px; }
+        .main-title { font-size: calc(28px + var(--fs-adj, 0px)); color: #000000; margin: 0; z-index: 3; padding-top: 50px; position: relative; padding-left: 150px; padding-right: 16px; line-height: 1.15; }
 
         .pill-banner {
             background-color: #0097ab;
             color: #ffffff;
             text-align: center;
-            font-size: 12px;
+            font-size: calc(11px + var(--fs-adj, 0px));
             font-weight: bold;
             letter-spacing: 0.9px;
             padding: 8px;
@@ -262,19 +295,19 @@
 
         .top-grid { display: grid; grid-template-columns: 36% 62%; gap: 2%; }
 
-        .teal-box { background-color: #008b9b; color: white; padding: 18px 16px; border-radius: 3px; font-size: 12.5px; line-height: 1.45; }
-        .teal-box .salutation { font-size: 13.5px; font-weight: bold; }
-        .teal-box p { font-size: 12.5px; line-height: 1.45; margin: 8px 0; }
+        .teal-box { background-color: #008b9b; color: white; padding: 18px 16px; border-radius: 3px; font-size: calc(11.5px + var(--fs-adj, 0px)); line-height: 1.45; }
+        .teal-box .salutation { font-size: calc(12.5px + var(--fs-adj, 0px)); font-weight: bold; }
+        .teal-box p { font-size: calc(11.5px + var(--fs-adj, 0px)); line-height: 1.45; margin: 8px 0; }
 
-        .pink-box { background-color: #ff5252; color: #000; padding: 18px 16px; border-radius: 3px; margin-bottom: 12px; font-size: 12.5px; line-height: 1.45; }
-        .pink-box h3 { font-size: 17px; margin: 0 0 8px 0; }
+        .pink-box { background-color: #ff5252; color: #000; padding: 18px 16px; border-radius: 3px; margin-bottom: 12px; font-size: calc(11.5px + var(--fs-adj, 0px)); line-height: 1.45; }
+        .pink-box h3 { font-size: calc(16px + var(--fs-adj, 0px)); margin: 0 0 8px 0; }
         .pink-box ul { margin: 6px 0 0 0; padding-left: 16px; }
 
         .screenshot-footer-box {
             background-color: #2c597c;
             color: #ffffff;
             padding: 16px 14px;
-            font-size: 12px;
+            font-size: calc(11px + var(--fs-adj, 0px));
             border-radius: 2px;
             display: grid;
             grid-template-columns: 46% 51%;
@@ -297,7 +330,7 @@
             justify-content: center;
             color: #ffffff;
             font-weight: bold;
-            font-size: 12px;
+            font-size: calc(11px + var(--fs-adj, 0px));
             text-decoration: none;
             font-family: Arial, sans-serif;
         }
@@ -315,10 +348,12 @@
         
         .p2-red-block h2, .p2-teal-block h3, .p2-orange-block h3, .p2-blue-block h3 { margin-top: 0; }
 
-        /* Bottom blocks had no set size (browser default 16px / 18.72px / 24px) -> +1 */
-        .bottom-sections p, .bottom-sections ul { font-size: 17px; }
-        .bottom-sections h3 { font-size: 19.72px; }
-        .bottom-sections h2 { font-size: 25px; }
+        /* Bottom blocks use the same text size as the top boxes */
+        .bottom-sections p, .bottom-sections ul { font-size: calc(11.5px + var(--fs-adj, 0px)); line-height: 1.45; }
+        .bottom-sections h3 { font-size: calc(16px + var(--fs-adj, 0px)); margin-bottom: 8px; }
+        .bottom-sections h2 { font-size: calc(18px + var(--fs-adj, 0px)); margin-bottom: 8px; }
+        .bottom-sections p { margin: 0 0 6px 0; }
+        .bottom-sections ul { margin: 6px 0 0 0; padding-left: 16px; }
     </style>
 </head>
 <body>
@@ -327,11 +362,31 @@
     <div class="editor-panel">
         <h2>Single-Page Newsletter Editor</h2>
 
+        <div class="save-bar">
+            <div class="save-buttons">
+                <button type="button" class="btn-small" onclick="saveToFile()">💾 Save to file</button>
+                <button type="button" class="btn-small" onclick="document.getElementById('openFileInput').click()">📂 Open saved file</button>
+                <input type="file" id="openFileInput" accept=".json,application/json" style="display:none" onchange="openFromFile(event)">
+            </div>
+            <div class="save-status" id="saveStatus">Your work is saved automatically in this browser.</div>
+        </div>
+
         <div class="format-help">
             <strong>Text formatting</strong> (works in every box):<br>
             <code>**word**</code> → <strong>bold</strong><br>
             <code>==word==</code> → <mark>yellow highlight</mark><br>
             <code>**==word==**</code> → <strong><mark>bold + highlight</mark></strong>
+        </div>
+
+        <div class="form-group" style="margin-top:10px;">
+            <label>Newsletter text size:</label>
+            <select id="inTextSize" onchange="update()">
+                <option value="-2">Smaller</option>
+                <option value="-1">Small</option>
+                <option value="0" selected>Normal</option>
+                <option value="1">Large</option>
+                <option value="2">Larger</option>
+            </select>
         </div>
 
         <div class="section-title">1. Dispatch Settings</div>
@@ -400,6 +455,10 @@ New internal communication pipelines were created to connect regional branches.<
         <div class="form-group">
             <label>Instagram Link:</label>
             <input type="text" id="inIgUrl" value="https://instagram.com" placeholder="https://instagram.com/..." oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>Social Media Stats (dark blue box):</label>
+            <textarea id="inLiStats" rows="3" oninput="update()">Our LinkedIn page crossed 1,300 followers and ended September at 1,364. September added 94 followers, 7,511 impressions and a 16.9% rise in page views.</textarea>
         </div>
 
         <div class="section-title">6. Consolidation Block (Red)</div>
@@ -508,9 +567,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                                 </a>
                             </div>
                         </div>
-                        <div>
-                            On LI, we've reached 1,000 followers with a 10-40% engagement rate (well above the typical 5-15% rate).
-                        </div>
+                        <div id="outLiStats"></div>
                     </div>
                 </div>
             </div>
@@ -595,6 +652,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                 recipientEmails.push(value);
                 renderEmailChips();
                 input.value = '';
+                scheduleSave();
             }
         }
 
@@ -608,9 +666,21 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
         function removeEmail(index) {
             recipientEmails.splice(index, 1);
             renderEmailChips();
+            scheduleSave();
+        }
+
+        function getTextAdj() {
+            return parseFloat(getVal('inTextSize')) || 0;
+        }
+
+        function adjustEmailSizes(html) {
+            const adj = getTextAdj();
+            if (!adj) return html;
+            return html.replace(/font-size:([\d.]+)px/g, (m, n) => `font-size:${parseFloat(n) + adj}px`);
         }
 
         function update() {
+            document.getElementById('documentContainer').style.setProperty('--fs-adj', getTextAdj() + 'px');
             setHTML('outQuarter', 'inQuarter');
             setHTML('outMainTitle', 'inMainTitle');
             setHTML('outPillTagline', 'inPillTagline');
@@ -625,6 +695,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
             document.getElementById('outFbLink').href = getVal('inFbUrl') || '#';
             document.getElementById('outLiLink').href = getVal('inLiUrl') || '#';
             document.getElementById('outIgLink').href = getVal('inIgUrl') || '#';
+            setHTML('outLiStats', 'inLiStats');
 
             setHTML('outP2RedTitle', 'inP2RedTitle');
             setHTML('outP2RedSub', 'inP2RedSub');
@@ -689,15 +760,16 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
 
             const p2BlueTitle = fmt(getVal('inP2BlueTitle'));
             const p2BlueBullets = bulletItems('inP2BlueBullets');
+            const liStats = fmt(getVal('inLiStats'));
 
-            return `
+            const html = `
             <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#cbd5e1; padding:20px 0; width:100%;">
               <tr>
                 <td align="center">
                   <table role="presentation" width="650" border="0" cellspacing="0" cellpadding="0" style="background-color:#f7f3e8; padding:25px; font-family:Georgia, 'Times New Roman', serif; color:#111111; width:650px;">
                     
                     <tr>
-                      <td align="right" style="font-size:17px; font-weight:bold; padding-bottom:10px; font-family:Georgia, 'Times New Roman', serif;">${quarter}</td>
+                      <td align="right" style="font-size:16px; font-weight:bold; padding-bottom:10px; font-family:Georgia, 'Times New Roman', serif;">${quarter}</td>
                     </tr>
 
                     <tr>
@@ -716,7 +788,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                               </table>
                             </td>
                             <td valign="middle" align="left" style="padding-left:15px;">
-                              <h1 style="margin:0; font-size:25px; color:#000000; font-family:Georgia, 'Times New Roman', serif; font-weight:bold; line-height:1.2;">${mainTitle}</h1>
+                              <h1 style="margin:0; font-size:24px; color:#000000; font-family:Georgia, 'Times New Roman', serif; font-weight:bold; line-height:1.2;">${mainTitle}</h1>
                             </td>
                           </tr>
                         </table>
@@ -725,7 +797,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
 
                     <tr>
                       <td style="padding:15px 0;">
-                        <div style="background-color:#0097ab; color:#ffffff; text-align:center; padding:10px; font-size:12px; font-weight:bold; letter-spacing:1px; border-radius:20px; font-family:Georgia, 'Times New Roman', serif;">
+                        <div style="background-color:#0097ab; color:#ffffff; text-align:center; padding:10px; font-size:11px; font-weight:bold; letter-spacing:1px; border-radius:20px; font-family:Georgia, 'Times New Roman', serif;">
                           ${tagline}
                         </div>
                       </td>
@@ -735,7 +807,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                       <td style="padding-bottom:15px;">
                         <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                           <tr>
-                            <td width="235" valign="top" style="background-color:#008b9b; color:#ffffff; padding:15px; border-radius:4px; font-size:13px; line-height:1.4; font-family:Georgia, 'Times New Roman', serif;">
+                            <td width="235" valign="top" style="background-color:#008b9b; color:#ffffff; padding:15px; border-radius:4px; font-size:12px; line-height:1.4; font-family:Georgia, 'Times New Roman', serif;">
                               <strong>${salutation}</strong><br><br>
                               ${intro}<br><br>
                               With gratitude,<br>
@@ -745,18 +817,18 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                             <td width="350" valign="top">
                               <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
-                                  <td style="background-color:#ff5252; color:#000000; padding:15px; border-radius:4px; font-size:13px; line-height:1.4; font-family:Georgia, 'Times New Roman', serif;">
-                                    <h3 style="margin:0 0 6px 0; font-size:15px; color:#000000; font-family:Georgia, 'Times New Roman', serif;">${pinkTitle}</h3>
+                                  <td style="background-color:#ff5252; color:#000000; padding:15px; border-radius:4px; font-size:12px; line-height:1.4; font-family:Georgia, 'Times New Roman', serif;">
+                                    <h3 style="margin:0 0 6px 0; font-size:14px; color:#000000; font-family:Georgia, 'Times New Roman', serif;">${pinkTitle}</h3>
                                     ${pinkSubtext}
                                     <ul style="margin:6px 0 0 0; padding-left:16px;">${pinkBullets}</ul>
                                   </td>
                                 </tr>
                                 <tr><td height="10"></td></tr>
                                 <tr>
-                                  <td style="background-color:#2c597c; color:#ffffff; padding:12px; border-radius:4px; font-size:12px; line-height:1.4; font-family:Georgia, 'Times New Roman', serif;">
+                                  <td style="background-color:#2c597c; color:#ffffff; padding:12px; border-radius:4px; font-size:11px; line-height:1.4; font-family:Georgia, 'Times New Roman', serif;">
                                     <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                                       <tr>
-                                        <td width="50%" valign="top" style="color:#ffffff; font-family:Georgia, 'Times New Roman', serif; font-size:12px;">
+                                        <td width="50%" valign="top" style="color:#ffffff; font-family:Georgia, 'Times New Roman', serif; font-size:11px;">
                                           Contact Us:<br>
                                           <u>CALLSnetwork@Outlook.com</u><br>
                                           www.callsnetwork.org<br><br>
@@ -764,11 +836,11 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                                           <table role="presentation" border="0" cellspacing="0" cellpadding="0">
                                             <tr>
                                               <td style="background-color:#1877f2; width:22px; height:22px; border-radius:50%; text-align:center;" valign="middle">
-                                                <a href="${fbUrl}" target="_blank" style="color:#ffffff; text-decoration:none; font-weight:bold; font-size:12px; font-family:Arial, sans-serif;">f</a>
+                                                <a href="${fbUrl}" target="_blank" style="color:#ffffff; text-decoration:none; font-weight:bold; font-size:11px; font-family:Arial, sans-serif;">f</a>
                                               </td>
                                               <td width="6"></td>
                                               <td style="background-color:#0a66c2; width:22px; height:22px; border-radius:50%; text-align:center;" valign="middle">
-                                                <a href="${liUrl}" target="_blank" style="color:#ffffff; text-decoration:none; font-weight:bold; font-size:11px; font-family:Arial, sans-serif;">in</a>
+                                                <a href="${liUrl}" target="_blank" style="color:#ffffff; text-decoration:none; font-weight:bold; font-size:10px; font-family:Arial, sans-serif;">in</a>
                                               </td>
                                               <td width="6"></td>
                                               <td style="background-color:#e4405f; width:22px; height:22px; border-radius:50%; text-align:center;" valign="middle">
@@ -784,8 +856,8 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                                           </table>
 
                                         </td>
-                                        <td width="50%" valign="top" style="color:#ffffff; font-size:11px; font-family:Georgia, 'Times New Roman', serif;">
-                                          On LI, we've reached 1,000 followers with a 10-40% engagement rate (well above typical 5-15%).
+                                        <td width="50%" valign="top" style="color:#ffffff; font-size:10px; font-family:Georgia, 'Times New Roman', serif;">
+                                          ${liStats}
                                         </td>
                                       </tr>
                                     </table>
@@ -800,8 +872,8 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
 
                     <tr>
                       <td style="padding-bottom:10px;">
-                        <div style="background-color:#e54c38; color:#000000; padding:14px; border-radius:4px; font-size:13px; font-family:Georgia, 'Times New Roman', serif;">
-                          <h2 style="margin:0 0 4px 0; font-size:16px; color:#000000; font-family:Georgia, 'Times New Roman', serif;">${p2RedTitle}</h2>
+                        <div style="background-color:#e54c38; color:#000000; padding:14px; border-radius:4px; font-size:12px; font-family:Georgia, 'Times New Roman', serif;">
+                          <h2 style="margin:0 0 4px 0; font-size:15px; color:#000000; font-family:Georgia, 'Times New Roman', serif;">${p2RedTitle}</h2>
                           ${p2RedSub}
                         </div>
                       </td>
@@ -809,8 +881,8 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
 
                     <tr>
                       <td style="padding-bottom:10px;">
-                        <div style="background-color:#008b9b; color:#ffffff; padding:14px; border-radius:4px; font-size:13px; font-family:Georgia, 'Times New Roman', serif;">
-                          <h3 style="margin:0 0 4px 0; font-size:15px; color:#ffffff; font-family:Georgia, 'Times New Roman', serif;">${p2TealTitle}</h3>
+                        <div style="background-color:#008b9b; color:#ffffff; padding:14px; border-radius:4px; font-size:12px; font-family:Georgia, 'Times New Roman', serif;">
+                          <h3 style="margin:0 0 4px 0; font-size:14px; color:#ffffff; font-family:Georgia, 'Times New Roman', serif;">${p2TealTitle}</h3>
                           ${p2TealIntro}
                           <ul style="margin:6px 0 0 0; padding-left:16px;">${p2TealBullets}</ul>
                         </div>
@@ -819,8 +891,8 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
 
                     <tr>
                       <td style="padding-bottom:10px;">
-                        <div style="background-color:#f3be6c; color:#000000; padding:14px; border-radius:4px; font-size:13px; font-family:Georgia, 'Times New Roman', serif;">
-                          <h3 style="margin:0 0 4px 0; font-size:15px; color:#000000; font-family:Georgia, 'Times New Roman', serif;">${p2YellowTitle}</h3>
+                        <div style="background-color:#f3be6c; color:#000000; padding:14px; border-radius:4px; font-size:12px; font-family:Georgia, 'Times New Roman', serif;">
+                          <h3 style="margin:0 0 4px 0; font-size:14px; color:#000000; font-family:Georgia, 'Times New Roman', serif;">${p2YellowTitle}</h3>
                           ${p2YellowP1}
                           <ul style="margin:6px 0 0 0; padding-left:16px;">${p2YellowBullets}</ul>
                         </div>
@@ -829,8 +901,8 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
 
                     <tr>
                       <td>
-                        <div style="background-color:#2c597c; color:#ffffff; padding:14px; border-radius:4px; font-size:13px; font-family:Georgia, 'Times New Roman', serif;">
-                          <h3 style="margin:0 0 4px 0; font-size:15px; color:#ffffff; font-family:Georgia, 'Times New Roman', serif;">${p2BlueTitle}</h3>
+                        <div style="background-color:#2c597c; color:#ffffff; padding:14px; border-radius:4px; font-size:12px; font-family:Georgia, 'Times New Roman', serif;">
+                          <h3 style="margin:0 0 4px 0; font-size:14px; color:#ffffff; font-family:Georgia, 'Times New Roman', serif;">${p2BlueTitle}</h3>
                           <ul style="margin:6px 0 0 0; padding-left:16px;">${p2BlueBullets}</ul>
                         </div>
                       </td>
@@ -840,6 +912,7 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
                 </td>
               </tr>
             </table>`;
+            return adjustEmailSizes(html);
         }
 
         async function sendBatchEmail() {
@@ -875,30 +948,214 @@ Formed new strategic alliances with municipal advocacy groups.</textarea>
             }
         }
 
-        async function exportToPDF() {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
+        /* ---------- SAVING ----------
+           Everything you type is saved automatically in this browser.
+           "Save to file" downloads a copy you can keep, email to a colleague
+           or open on another computer with "Open saved file". */
+        const STORAGE_KEY = 'callsNewsletterDraft_v1';
+        let saveTimer = null;
 
-            // Capture the page at full size, not the shrunken preview
-            const scaler = document.getElementById('pageScaler');
-            scaler.style.transform = 'none';
-            let canvas;
+        function editorFields() {
+            return [...document.querySelectorAll('.editor-panel input[id], .editor-panel textarea[id], .editor-panel select[id]')]
+                .filter(el => el.id !== 'emailInput' && el.type !== 'file');
+        }
+
+        function collectDraft() {
+            const fields = {};
+            editorFields().forEach(el => { fields[el.id] = el.value; });
+            return { app: 'calls-newsletter', version: 1, savedAt: new Date().toISOString(), fields, recipients: recipientEmails.slice() };
+        }
+
+        function applyDraft(draft) {
+            if (!draft || typeof draft.fields !== 'object') return false;
+            editorFields().forEach(el => {
+                if (Object.prototype.hasOwnProperty.call(draft.fields, el.id)) el.value = draft.fields[el.id];
+            });
+            if (Array.isArray(draft.recipients)) recipientEmails = draft.recipients.filter(x => typeof x === 'string');
+            renderEmailChips();
+            update();
+            return true;
+        }
+
+        function setSaveStatus(text) {
+            document.getElementById('saveStatus').innerText = text;
+        }
+
+        function saveLocal() {
             try {
-                canvas = await html2canvas(document.getElementById('documentContainer'), { scale: 2, useCORS: true });
-            } finally {
-                fitPreview();
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(collectDraft()));
+                const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                setSaveStatus('✓ Saved automatically in this browser at ' + t);
+            } catch (e) {
+                setSaveStatus('⚠ This browser blocked auto-save. Use "Save to file" to keep your work.');
             }
-            const imgData = canvas.toDataURL('image/jpeg', 1.0);
-            const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-            
-            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, imgHeight);
-            pdf.save('CALLS_Network_Newsletter.pdf');
+        }
+
+        function scheduleSave() {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(saveLocal, 400);
+        }
+
+        function loadLocal() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw && applyDraft(JSON.parse(raw))) {
+                    setSaveStatus('✓ Restored your last version');
+                    return true;
+                }
+            } catch (e) { /* nothing saved yet */ }
+            return false;
+        }
+
+        function saveToFile() {
+            const blob = new Blob([JSON.stringify(collectDraft(), null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const name = (getVal('inQuarter') || 'Newsletter').replace(/[^\w\-]+/g, '_');
+            a.href = url;
+            a.download = `CALLS_Newsletter_${name}.json`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            setSaveStatus('✓ Downloaded ' + a.download);
+        }
+
+        function openFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    if (applyDraft(JSON.parse(reader.result))) {
+                        saveLocal();
+                        setSaveStatus('✓ Opened ' + file.name);
+                    } else {
+                        alert("This file isn't a saved newsletter.");
+                    }
+                } catch (err) {
+                    alert("This file isn't a saved newsletter.");
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        /* ---------- PDF (as many A4 pages as needed) ---------- */
+
+        // Areas the page break must not cut through: every line of text, headings, banner, icons.
+        function getUnbreakableRects(root, originTop) {
+            const rects = [];
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+            const range = document.createRange();
+            while (walker.nextNode()) {
+                const node = walker.currentNode;
+                if (!node.textContent.trim()) continue;
+                range.selectNodeContents(node);
+                for (const r of range.getClientRects()) {
+                    if (r.height > 0) rects.push({ top: r.top - originTop - 3, bottom: r.bottom - originTop + 3 });
+                }
+            }
+            root.querySelectorAll('.banner-wrapper, .circle-group, .pill-banner, .social-links').forEach(el => {
+                const r = el.getBoundingClientRect();
+                rects.push({ top: r.top - originTop - 4, bottom: r.bottom - originTop + 4 });
+            });
+            // Never leave just the top edge of a coloured box at the bottom of a page
+            root.querySelectorAll('.bottom-sections > div, .teal-box, .pink-box, .screenshot-footer-box').forEach(el => {
+                const r = el.getBoundingClientRect();
+                rects.push({ top: r.top - originTop - 8, bottom: r.top - originTop + 60 });
+            });
+            // Keep each heading together with at least the first lines below it
+            root.querySelectorAll('h2, h3, .salutation').forEach(el => {
+                const r = el.getBoundingClientRect();
+                rects.push({ top: r.top - originTop - 4, bottom: r.bottom - originTop + 45 });
+            });
+            return rects;
+        }
+
+        function findSafeBreak(rects, start, limit) {
+            let y = limit, moved = true, guard = 0;
+            while (moved && guard++ < 1000) {
+                moved = false;
+                for (const r of rects) {
+                    if (r.top < y && r.bottom > y) { y = r.top; moved = true; }
+                }
+            }
+            return (y - start < 80) ? limit : y;
+        }
+
+        async function exportToPDF() {
+            const btn = document.querySelector('.btn-pdf');
+            const label = btn.innerText;
+            btn.innerText = '⏳ Creating PDF...';
+            btn.disabled = true;
+
+            const frame = document.getElementById('pageFrame');
+            const scaler = document.getElementById('pageScaler');
+            const page = document.getElementById('documentContainer');
+
+            try {
+                // Capture at full size, not the shrunken preview
+                scaler.style.transform = 'none';
+                frame.style.width = 'auto';
+                frame.style.height = 'auto';
+                frame.style.overflow = 'visible';
+                if (document.fonts && document.fonts.ready) await document.fonts.ready;
+
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const PAGE_W = 210, PAGE_H = 297, MARGIN = 12;
+
+                const pageRect = page.getBoundingClientRect();
+                const mmPerPx = PAGE_W / pageRect.width;
+                const rects = getUnbreakableRects(page, pageRect.top);
+                const lastBlock = page.querySelector('.bottom-sections').getBoundingClientRect();
+                const contentEnd = Math.min(pageRect.height, lastBlock.bottom - pageRect.top + 6);
+
+                const canvas = await html2canvas(page, { scale: 2, useCORS: true, backgroundColor: '#f7f3e8' });
+                const k = canvas.width / pageRect.width;
+
+                let start = 0, pageNo = 0;
+                while (start < contentEnd - 1 && pageNo < 20) {
+                    const topMm = pageNo === 0 ? 0 : MARGIN;
+                    const availPx = (PAGE_H - topMm - MARGIN) / mmPerPx;
+                    let end = start + availPx;
+                    end = (end >= contentEnd) ? contentEnd : findSafeBreak(rects, start, end);
+
+                    if (pageNo > 0) pdf.addPage();
+                    pdf.setFillColor(247, 243, 232);
+                    pdf.rect(0, 0, PAGE_W, PAGE_H, 'F');
+
+                    const sy = Math.round(start * k);
+                    const sh = Math.max(1, Math.min(Math.round((end - start) * k), canvas.height - sy));
+                    const slice = document.createElement('canvas');
+                    slice.width = canvas.width;
+                    slice.height = sh;
+                    slice.getContext('2d').drawImage(canvas, 0, sy, canvas.width, sh, 0, 0, canvas.width, sh);
+                    pdf.addImage(slice.toDataURL('image/jpeg', 0.95), 'JPEG', 0, topMm, PAGE_W, (sh / k) * mmPerPx);
+
+                    start = end;
+                    pageNo++;
+                }
+
+                pdf.save('CALLS_Network_Newsletter.pdf');
+            } catch (err) {
+                console.error('PDF export failed:', err);
+                alert('Sorry, the PDF could not be created. Please try again.');
+            } finally {
+                frame.style.overflow = '';
+                fitPreview();
+                btn.innerText = label;
+                btn.disabled = false;
+            }
         }
 
         window.onload = function() {
+            document.querySelector('.editor-panel').addEventListener('input', scheduleSave);
+            document.querySelector('.editor-panel').addEventListener('change', scheduleSave);
             renderEmailChips();
-            update();
+            if (!loadLocal()) update();
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitPreview);
         };
     </script>
 </body>
